@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { Client, Message } from 'discord.js';
 import { VcService } from './vc.service';
 import { InjectDiscordClient, Once, PrefixCommand } from '@discord-nestjs/core';
+import { commands } from './commands';
 @Controller()
 export class VcController {
   constructor(
@@ -13,7 +14,7 @@ export class VcController {
   @Once('ready')
   async ready() {
     console.log('ready');
-    await this.client.application.commands.set();
+    await this.client.application.commands.set(commands);
   }
   @PrefixCommand('help')
   async onHelp(message: Message) {
