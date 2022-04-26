@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Collection, GuildMember, Message } from 'discord.js';
+import { Collection, GuildMember, Message, Snowflake } from 'discord.js';
 
 @Injectable()
 export class VcService {
@@ -15,13 +15,20 @@ export class VcService {
 
     const messages = await message.channel.messages.fetch({
       before: message.id,
-      limit: 4,
+      limit: 10,
     });
 
-    //チーム分けメッセージの抽出
-    const teamMessage = messages
-      .filter((message) => message.cleanContent.indexOf('Attacker Side') != -1)
-      .last().content;
+    let teamMessage: string;
+    try {
+      //チーム分けメッセージの抽出
+      teamMessage = messages
+        .filter(
+          (message) => message.cleanContent.indexOf('Attacker Side') != -1,
+        )
+        .last().content;
+    } catch (e) {
+      return message.reply('チーム分けのメッセージが見つかりません。');
+    }
 
     const ids = teamMessage
       .match(/@(\d{18})/g)
@@ -32,17 +39,15 @@ export class VcService {
       return message.reply('人数が足りません');
     }
 
-    const attacker = ids.splice(0, length / 2);
-    const defender = ids;
+    const defender = ids.splice(0, length / 2);
+    const attacker = ids;
 
     const channels = message.guild.channels.cache;
-
-    const voiceChannelId = new Array<string>();
-    channels.forEach((channel) => {
-      if (channel.type == 'GUILD_VOICE') {
-        voiceChannelId.push(channel.id);
-      }
-    });
+    const voiceChannels = channels.filter(
+      (channel) => channel.type == 'GUILD_VOICE',
+    );
+    const attackerVoiceChannelId = voiceChannels.first().id;
+    const defenderVoiceChannelId = voiceChannels.last().id;
 
     voiceMembers.forEach((member) => console.log(member.id));
     console.log(attacker, defender);
@@ -51,14 +56,40 @@ export class VcService {
       const id = member.id.slice(0, 17);
       if (attacker.indexOf(id) != -1) {
         console.log('attacker', member.id);
-        member.voice.setChannel(voiceChannelId.pop());
+        member.voice.setChannel(attackerVoiceChannelId);
       }
       if (defender.indexOf(id) != -1) {
         console.log('defender', member.id);
-        member.voice.setChannel(voiceChannelId.pop());
+        member.voice.setChannel(defenderVoiceChannelId);
       }
     });
 
     return message.reply('ボイスチャンネルを移動しました');
+  }
+  public async finish(message: Message) {
+    const channels = message.guild.channels;
+    const voiceChannels = channels.cache.filter(
+      (channel) => channel.type == 'GUILD_VOICE',
+    );
+    const oneOfVoiceChannelId = voiceChannels.first().id;
+    const connectingVoiceChannelMembers = voiceChannels.map((channel) => {
+      return channel.members;
+    });
+
+    const members = new Array<GuildMember>();
+
+    connectingVoiceChannelMembers.forEach(
+      (collection: Collection<Snowflake, GuildMember>) => {
+        collection.forEach((member) => {
+          members.push(member);
+        });
+      },
+    );
+
+    members.forEach((member) => {
+      member.voice.setChannel(oneOfVoiceChannelId);
+    });
+
+    return message.reply('もどりました');
   }
 }

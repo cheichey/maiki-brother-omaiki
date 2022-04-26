@@ -13,6 +13,7 @@ export class VcController {
   @Once('ready')
   async ready() {
     console.log('ready');
+    await this.client.application.commands.set();
   }
   @PrefixCommand('help')
   async onHelp(message: Message) {
@@ -21,6 +22,10 @@ export class VcController {
 
   @PrefixCommand('start')
   async onStart(message: Message) {
-    return this.vcService.start(message);
+    this.vcService.start(message);
+  }
+  @PrefixCommand('finish')
+  async onFinish(message: Message) {
+    this.vcService.finish(message);
   }
 }
