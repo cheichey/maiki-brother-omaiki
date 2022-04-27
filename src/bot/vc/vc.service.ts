@@ -1,95 +1,64 @@
 import { Injectable } from '@nestjs/common';
-import { Collection, GuildMember, Message, Snowflake } from 'discord.js';
+import { GuildMember, Message } from 'discord.js';
+import { getVoiceChannelGuildMembers } from './utils/getVoiceChannelGuildMembers';
+import { getMessagesByMessage } from './utils/getMessagesByMessage';
+import { getTeamSplittingMessage } from './utils/getTeamSplittingMessage';
+import { getNumberOfJoinedVoiceChannelPeople } from './utils/getNumberOfJoinedVoiceChannelPeople';
+import { getIdFromTeamSplittingMessage } from './utils/getIdFromTeamSplittingMessage';
+import { getChannels } from './utils/getChannels';
+import { getVoiceChannels } from './utils/getVoiceChannels';
+import { replyMessage } from './utils/replyMessage';
+import { getConnectingVoiceChannelGuildMember } from './utils/getConnectingVoiceChannelGuildMember';
 
 @Injectable()
 export class VcService {
   public async start(message: Message): Promise<Message> {
-    const member = await message.member.fetch(true);
-    const voiceState = member.voice;
-    let voiceMembers: Collection<string, GuildMember>;
-    try {
-      voiceMembers = voiceState.channel.members;
-    } catch (e) {
-      return message.reply('ボイスチャンネルに人がいません');
-    }
-
-    const messages = await message.channel.messages.fetch({
-      before: message.id,
-      limit: 10,
-    });
-
-    let teamMessage: string;
-    try {
-      //チーム分けメッセージの抽出
-      teamMessage = messages
-        .filter(
-          (message) => message.cleanContent.indexOf('Attacker Side') != -1,
-        )
-        .last().content;
-    } catch (e) {
-      return message.reply('チーム分けのメッセージが見つかりません。');
-    }
-
-    const ids = teamMessage
-      .match(/@(\d{18})/g)
-      .map((message) => message.slice(1, 18));
-
-    const length = ids.length;
-    if (length < 1) {
-      return message.reply('人数が足りません');
-    }
-
-    const defender = ids.splice(0, length / 2);
-    const attacker = ids;
-
-    const channels = message.guild.channels.cache;
-    const voiceChannels = channels.filter(
-      (channel) => channel.type == 'GUILD_VOICE',
+    // ボイスチャットに十分な人数がいるか確認
+    const voiceMembers = await getVoiceChannelGuildMembers(message);
+    const numberOfPeople = await getNumberOfJoinedVoiceChannelPeople(message);
+    if (numberOfPeople < 1)
+      return replyMessage(
+        message,
+        'ボイスチャットに人がいないか、人数が足りないよ！',
+      );
+    // チーム分けメッセージの取得
+    const messages = await getMessagesByMessage(message, 10);
+    const teamMessage = getTeamSplittingMessage(messages);
+    if (!teamMessage)
+      return replyMessage(message, 'チーム分けのメッセージが見つからないよ！');
+    // チーム分けメッセージからidの取得
+    const { attacker, defender } = getIdFromTeamSplittingMessage(
+      teamMessage,
+      numberOfPeople,
     );
-    const attackerVoiceChannelId = voiceChannels.first().id;
-    const defenderVoiceChannelId = voiceChannels.last().id;
-
-    voiceMembers.forEach((member) => console.log(member.id));
-    console.log(attacker, defender);
+    const channels = getChannels(message);
+    const [attackerVoiceChannel, defenderVoiceChannel] = getVoiceChannels(
+      channels,
+      2,
+    );
 
     voiceMembers.forEach((member) => {
       const id = member.id.slice(0, 17);
       if (attacker.indexOf(id) != -1) {
-        console.log('attacker', member.id);
-        member.voice.setChannel(attackerVoiceChannelId);
+        member.voice.setChannel(attackerVoiceChannel.id);
       }
       if (defender.indexOf(id) != -1) {
-        console.log('defender', member.id);
-        member.voice.setChannel(defenderVoiceChannelId);
+        member.voice.setChannel(defenderVoiceChannel.id);
       }
     });
 
-    return message.reply('ボイスチャンネルを移動しました');
+    return replyMessage(message, 'ボイスチャンネルを移動したよ！');
   }
   public async finish(message: Message) {
-    const channels = message.guild.channels;
-    const voiceChannels = channels.cache.filter(
-      (channel) => channel.type == 'GUILD_VOICE',
-    );
-    const oneOfVoiceChannelId = voiceChannels.first().id;
-    const connectingVoiceChannelMembers = voiceChannels.map((channel) => {
-      return channel.members;
+    const channels = getChannels(message);
+    const oneOfVoiceChannel = getVoiceChannels(channels, 1)[0];
+    const connectingMembers: Array<GuildMember> =
+      getConnectingVoiceChannelGuildMember(channels);
+
+    connectingMembers.forEach((member) => {
+      member.voice.setChannel(oneOfVoiceChannel.id);
     });
 
-    const members = new Array<GuildMember>();
-
-    connectingVoiceChannelMembers.forEach(
-      (collection: Collection<Snowflake, GuildMember>) => {
-        collection.forEach((member) => {
-          members.push(member);
-        });
-      },
-    );
-
-    members.forEach((member) => {
-      member.voice.setChannel(oneOfVoiceChannelId);
-    });
-
-    return message.reply('もどりました');
+    return replyMessage(message, '結果はおまいきの負け！');
   }
 }

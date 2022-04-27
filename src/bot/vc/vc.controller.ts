@@ -14,7 +14,12 @@ export class VcController {
   @Once('ready')
   async ready() {
     console.log('ready');
-    await this.client.application.commands.set(commands);
+    Promise.all([
+      this.client.application.commands.set(commands),
+      this.client.user.setActivity({
+        name: '探さないでください。おまいきーといっしょにコストコに行ってますngo',
+      }),
+    ]);
   }
   @PrefixCommand('help')
   async onHelp(message: Message) {
