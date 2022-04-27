@@ -1,5 +1,5 @@
-import { Message } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
 
-export const getChannels = (message: Message) => {
-  return message.guild.channels.cache;
+export const getChannels = (interaction: CommandInteraction) => {
+  return interaction.guild.channels.cache;
 };

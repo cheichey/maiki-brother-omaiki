@@ -1,42 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { GuildMember, Message } from 'discord.js';
+import { CommandInteraction, GuildMember } from 'discord.js';
 import { getVoiceChannelGuildMembers } from './utils/getVoiceChannelGuildMembers';
-import { getMessagesByMessage } from './utils/getMessagesByMessage';
+import { getMessagesByInteraction } from './utils/getMessagesByInteraction';
 import { getTeamSplittingMessage } from './utils/getTeamSplittingMessage';
 import { getNumberOfJoinedVoiceChannelPeople } from './utils/getNumberOfJoinedVoiceChannelPeople';
 import { getIdFromTeamSplittingMessage } from './utils/getIdFromTeamSplittingMessage';
 import { getChannels } from './utils/getChannels';
 import { getVoiceChannels } from './utils/getVoiceChannels';
-import { replyMessage } from './utils/replyMessage';
 import { getConnectingVoiceChannelGuildMember } from './utils/getConnectingVoiceChannelGuildMember';
 
 @Injectable()
 export class VcService {
-  public async start(message: Message): Promise<Message> {
+  public async start(interaction: CommandInteraction): Promise<string> {
     // ボイスチャットに十分な人数がいるか確認
-    const voiceMembers = await getVoiceChannelGuildMembers(message);
-    const numberOfPeople = await getNumberOfJoinedVoiceChannelPeople(message);
+    const voiceMembers = await getVoiceChannelGuildMembers(interaction);
+    const numberOfPeople = await getNumberOfJoinedVoiceChannelPeople(
+      interaction,
+    );
     if (numberOfPeople < 1)
-      return replyMessage(
-        message,
-        'ボイスチャットに人がいないか、人数が足りないよ！',
-      );
-    // チーム分けメッセージの取得y
-    const messages = await getMessagesByMessage(message, 10);
+      return 'ボイスチャットに人がいないか、人数が足りないよ！';
+    // チーム分けメッセージの取得
+    const messages = await getMessagesByInteraction(interaction, 10);
     const teamMessage = getTeamSplittingMessage(messages);
-    if (!teamMessage)
-      return replyMessage(message, 'チーム分けのメッセージが見つからないよ！');
+    if (!teamMessage) return 'チーム分けのメッセージが見つからないよ！';
     // チーム分けメッセージからidの取得
     const { attacker, defender } = getIdFromTeamSplittingMessage(
       teamMessage,
       numberOfPeople,
     );
-    const channels = getChannels(message);
+    console.log(teamMessage, numberOfPeople);
+    const channels = getChannels(interaction);
     const [attackerVoiceChannel, defenderVoiceChannel] = getVoiceChannels(
       channels,
       2,
     );
-
     voiceMembers.forEach((member) => {
       const id = member.id.slice(0, 17);
       if (attacker.indexOf(id) != -1) {
@@ -47,10 +44,10 @@ export class VcService {
       }
     });
 
-    return replyMessage(message, 'ボイスチャンネルを移動したよ！');
+    return 'ボイスチャンネルを移動したよ！';
   }
-  public async finish(message: Message): Promise<Message> {
-    const channels = getChannels(message);
+  public async finish(interaction: CommandInteraction): Promise<string> {
+    const channels = getChannels(interaction);
     const oneOfVoiceChannel = getVoiceChannels(channels, 1)[0];
     const connectingMembers: Array<GuildMember> =
       getConnectingVoiceChannelGuildMember(channels);
@@ -59,6 +56,6 @@ export class VcService {
       member.voice.setChannel(oneOfVoiceChannel.id);
     });
 
-    return replyMessage(message, '結果はおまいきの負け！');
+    return '結果はおまいきの負け！';
   }
 }

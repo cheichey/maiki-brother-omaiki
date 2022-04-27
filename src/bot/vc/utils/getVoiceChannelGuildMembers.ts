@@ -1,9 +1,9 @@
-import { Collection, GuildMember, Message } from 'discord.js';
+import { Collection, CommandInteraction, GuildMember } from 'discord.js';
 
 export const getVoiceChannelGuildMembers = async (
-  message: Message,
+  interaction: CommandInteraction,
 ): Promise<Collection<string, GuildMember>> | null => {
-  const member = await message.member.fetch(true);
+  const member = interaction.member as GuildMember;
   let vcMembers;
   try {
     vcMembers = member.voice.channel.members;

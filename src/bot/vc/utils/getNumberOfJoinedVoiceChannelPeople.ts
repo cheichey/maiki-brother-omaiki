@@ -1,10 +1,10 @@
 import { getVoiceChannelGuildMembers } from './getVoiceChannelGuildMembers';
-import { Message } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
 
 export const getNumberOfJoinedVoiceChannelPeople = async (
-  message: Message,
+  interaction: CommandInteraction,
 ): Promise<number> => {
-  const members = await getVoiceChannelGuildMembers(message);
+  const members = await getVoiceChannelGuildMembers(interaction);
   let size: number;
   try {
     size = members.size;
