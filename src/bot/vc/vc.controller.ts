@@ -3,6 +3,7 @@ import { Client, Message } from 'discord.js';
 import { VcService } from './vc.service';
 import { InjectDiscordClient, Once, PrefixCommand } from '@discord-nestjs/core';
 import { commands } from './commands';
+import { replyMessage } from './utils/replyMessage';
 @Controller()
 export class VcController {
   constructor(
@@ -23,7 +24,7 @@ export class VcController {
   }
   @PrefixCommand('help')
   async onHelp(message: Message) {
-    return message.reply('omaiki');
+    replyMessage(message, 'おまいきーです！');
   }
 
   @PrefixCommand('start')

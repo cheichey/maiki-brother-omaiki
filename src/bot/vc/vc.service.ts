@@ -21,7 +21,7 @@ export class VcService {
         message,
         'ボイスチャットに人がいないか、人数が足りないよ！',
       );
-    // チーム分けメッセージの取得
+    // チーム分けメッセージの取得y
     const messages = await getMessagesByMessage(message, 10);
     const teamMessage = getTeamSplittingMessage(messages);
     if (!teamMessage)
