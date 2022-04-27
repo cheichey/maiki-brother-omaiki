@@ -49,7 +49,7 @@ export class VcService {
 
     return replyMessage(message, 'ボイスチャンネルを移動したよ！');
   }
-  public async finish(message: Message) {
+  public async finish(message: Message): Promise<Message> {
     const channels = getChannels(message);
     const oneOfVoiceChannel = getVoiceChannels(channels, 1)[0];
     const connectingMembers: Array<GuildMember> =
