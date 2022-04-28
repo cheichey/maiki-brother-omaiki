@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { VcModule } from './bot/vc/vc.module';
 import { DiscordModule } from '@discord-nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Intents } from 'discord.js';
+import { BotModule } from './bot/bot.module';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { Intents } from 'discord.js';
       }),
       inject: [ConfigService],
     }),
-    VcModule,
+    BotModule,
   ],
 })
 export class AppModule {}

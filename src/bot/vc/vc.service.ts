@@ -28,7 +28,6 @@ export class VcService {
       teamMessage,
       numberOfPeople,
     );
-    console.log(teamMessage, numberOfPeople);
     const channels = getChannels(interaction);
     const [attackerVoiceChannel, defenderVoiceChannel] = getVoiceChannels(
       channels,
