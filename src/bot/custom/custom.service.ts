@@ -10,7 +10,7 @@ import { getVoiceChannels } from './utils/getVoiceChannels';
 import { getConnectingVoiceChannelGuildMember } from './utils/getConnectingVoiceChannelGuildMember';
 
 @Injectable()
-export class VcService {
+export class CustomService {
   public async start(interaction: CommandInteraction): Promise<string> {
     // ボイスチャットに十分な人数がいるか確認
     const voiceMembers = await getVoiceChannelGuildMembers(interaction);

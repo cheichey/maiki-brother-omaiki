@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CommandInteraction } from 'discord.js';
-import { getMessagesByInteraction } from '../vc/utils/getMessagesByInteraction';
+import { getMessagesByInteraction } from '../custom/utils/getMessagesByInteraction';
 import { getDataArray } from '../utils/getCollection';
 import { chooseRandomElement } from '../utils/chooseRandomElement';
 

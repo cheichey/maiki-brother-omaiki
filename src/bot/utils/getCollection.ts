@@ -1,5 +1,5 @@
 import { DataManager, Snowflake } from 'discord.js';
-import { collectionToArray } from '../vc/utils/collectionToArray';
+import { collectionToArray } from '../custom/utils/collectionToArray';
 
 export const getDataArray = <T, K>(
   dataManager: DataManager<Snowflake, T, K>,
