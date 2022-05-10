@@ -7,12 +7,10 @@ import {
 import { Injectable } from '@nestjs/common';
 import { CustomService } from '../custom.service';
 import { CommandInteraction } from 'discord.js';
+import { options } from './options';
 
 @Injectable()
-@Command({
-  name: 'finish',
-  description: 'カスタム終了',
-})
+@Command(options.finish)
 export class FinishCommand implements DiscordTransformedCommand<any> {
   constructor(private readonly vcService: CustomService) {}
   handler(

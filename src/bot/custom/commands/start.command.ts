@@ -7,12 +7,10 @@ import {
 import { Injectable } from '@nestjs/common';
 import { CustomService } from '../custom.service';
 import { CommandInteraction } from 'discord.js';
+import { options } from './options';
 
 @Injectable()
-@Command({
-  name: 'start',
-  description: 'カスタム開始',
-})
+@Command(options.start)
 export class StartCommand implements DiscordTransformedCommand<any> {
   constructor(private readonly vcService: CustomService) {}
   handler(
