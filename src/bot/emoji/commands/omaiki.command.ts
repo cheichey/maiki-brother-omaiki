@@ -7,19 +7,17 @@ import {
 import { CommandInteraction } from 'discord.js';
 import { EmojiService } from '../emoji.service';
 import { Injectable } from '@nestjs/common';
+import { options } from '../../options';
 
 @Injectable()
-@Command({
-  name: 'omaiki',
-  description: '絵文字をたくさんつけます',
-})
+@Command(options.omaiki)
 export class OmaikiCommand implements DiscordTransformedCommand<any> {
   constructor(private readonly emojiService: EmojiService) {}
   handler(
     @Payload() dto: any,
     { interaction }: TransformedCommandExecutionContext,
-  ): Promise<string> {
+  ): Promise<void> {
     if (!(interaction instanceof CommandInteraction)) return;
-    return this.emojiService.addEmoji(interaction);
+    this.emojiService.addEmoji(interaction);
   }
 }

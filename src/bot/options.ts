@@ -13,4 +13,12 @@ export const options: { [key: string]: CommandOptions } = {
     name: 'help',
     description: 'おまいきーげーみんぐ所属です',
   },
+  omaiki: {
+    name: 'omaiki',
+    description: '絵文字をたくさんつけます',
+  },
+  random: {
+    name: 'random',
+    description: 'ボイスチャットの人数からランダムに数字を言います',
+  },
 };

@@ -3,5 +3,5 @@ export const getIdFromTeamSplittingMessage = (
   number: number,
 ): { attacker: string[]; defender: string[] } => {
   const id = message.match(/@(\d{18})/g).map((message) => message.slice(1, 18));
-  return { defender: id.splice(0, number / 2), attacker: id };
+  return { attacker: id.splice(0, number / 2), defender: id };
 };

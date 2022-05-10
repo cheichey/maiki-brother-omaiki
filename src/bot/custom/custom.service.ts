@@ -12,34 +12,35 @@ import { getConnectingVoiceChannelGuildMember } from './utils/getConnectingVoice
 @Injectable()
 export class CustomService {
   public async start(interaction: CommandInteraction): Promise<string> {
-    // ボイスチャットに十分な人数がいるか確認
+    // ボイスチャットにいるメンバー
     const voiceMembers = await getVoiceChannelGuildMembers(interaction);
+    // ボイスチャットにいるメンバーの数
     const numberOfPeople = await getNumberOfJoinedVoiceChannelPeople(
       interaction,
     );
     if (numberOfPeople < 1)
       return 'ボイスチャットに人がいないか、人数が足りないよ！';
-    // チーム分けメッセージの取得
+    // チーム分けメッセージ
     const messages = await getMessagesByInteraction(interaction, 10);
+    // チーム分けの部分のみ
     const teamMessage = getTeamSplittingMessage(messages);
     if (!teamMessage) return 'チーム分けのメッセージが見つからないよ！';
-    // チーム分けメッセージからidの取得
+    // アタッカーとディフェンダーのid
     const { attacker, defender } = getIdFromTeamSplittingMessage(
       teamMessage,
       numberOfPeople,
     );
     const channels = getChannels(interaction);
-    const [attackerVoiceChannel, defenderVoiceChannel] = getVoiceChannels(
-      channels,
-      2,
-    );
+    const voiceChannel = getVoiceChannels(channels, 3);
     voiceMembers.forEach((member) => {
       const id = member.id.slice(0, 17);
+      console.log(attacker, defender, id);
       if (attacker.indexOf(id) != -1) {
-        member.voice.setChannel(attackerVoiceChannel.id);
-      }
-      if (defender.indexOf(id) != -1) {
-        member.voice.setChannel(defenderVoiceChannel.id);
+        member.voice.setChannel(voiceChannel[0].id);
+      } else if (defender.indexOf(id) != -1) {
+        member.voice.setChannel(voiceChannel[1].id);
+      } else {
+        member.voice.setChannel(voiceChannel[2].id);
       }
     });
 

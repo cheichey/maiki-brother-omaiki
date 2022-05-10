@@ -7,7 +7,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { CustomService } from '../custom.service';
 import { CommandInteraction } from 'discord.js';
-import { options } from './options';
+import { options } from '../../options';
 
 @Injectable()
 @Command(options.finish)

@@ -6,7 +6,7 @@ import {
   TransformedCommandExecutionContext,
 } from '@discord-nestjs/core';
 import { CommandInteraction } from 'discord.js';
-import { options } from './options';
+import { options } from '../../options';
 
 @Command(options.help)
 export class HelpCommand implements DiscordTransformedCommand<any> {

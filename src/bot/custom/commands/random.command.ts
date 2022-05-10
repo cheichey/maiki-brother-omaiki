@@ -4,20 +4,20 @@ import {
   Payload,
   TransformedCommandExecutionContext,
 } from '@discord-nestjs/core';
-import { Injectable } from '@nestjs/common';
-import { CustomService } from '../custom.service';
+import { getNumberOfJoinedVoiceChannelPeople } from '../utils/getNumberOfJoinedVoiceChannelPeople';
 import { CommandInteraction } from 'discord.js';
 import { options } from '../../options';
 
-@Injectable()
-@Command(options.start)
-export class StartCommand implements DiscordTransformedCommand<any> {
-  constructor(private readonly vcService: CustomService) {}
-  handler(
+@Command(options.random)
+export class RandomCommand implements DiscordTransformedCommand<any> {
+  async handler(
     @Payload() dto: any,
     { interaction }: TransformedCommandExecutionContext,
   ): Promise<string> {
     if (!(interaction instanceof CommandInteraction)) return;
-    return this.vcService.start(interaction);
+    const numberOfMember = await getNumberOfJoinedVoiceChannelPeople(
+      interaction,
+    );
+    return (Math.random() % numberOfMember).toString();
   }
 }
