@@ -6,8 +6,8 @@ import {
 } from '@discord-nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { CustomService } from '../custom.service';
-import { CommandInteraction } from 'discord.js';
 import { options } from '../../options';
+import { checkIsInteraction } from '../../utils/checkIsInteraction';
 
 @Injectable()
 @Command(options.finish)
@@ -17,7 +17,7 @@ export class FinishCommand implements DiscordTransformedCommand<any> {
     @Payload() dto: any,
     { interaction }: TransformedCommandExecutionContext,
   ): Promise<string> {
-    if (!(interaction instanceof CommandInteraction)) return;
+    if (!checkIsInteraction(interaction)) return;
     return this.vcService.finish(interaction);
   }
 }

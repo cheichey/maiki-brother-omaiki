@@ -5,8 +5,8 @@ import {
   TransformedCommandExecutionContext,
 } from '@discord-nestjs/core';
 import { getNumberOfJoinedVoiceChannelPeople } from '../utils/getNumberOfJoinedVoiceChannelPeople';
-import { CommandInteraction } from 'discord.js';
 import { options } from '../../options';
+import { checkIsInteraction } from '../../utils/checkIsInteraction';
 
 @Command(options.random)
 export class RandomCommand implements DiscordTransformedCommand<any> {
@@ -14,7 +14,7 @@ export class RandomCommand implements DiscordTransformedCommand<any> {
     @Payload() dto: any,
     { interaction }: TransformedCommandExecutionContext,
   ): Promise<string> {
-    if (!(interaction instanceof CommandInteraction)) return;
+    if (!checkIsInteraction(interaction)) return;
     const numberOfMember = await getNumberOfJoinedVoiceChannelPeople(
       interaction,
     );
