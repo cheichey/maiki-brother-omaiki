@@ -69,4 +69,8 @@ export class CustomService {
     const one = chooseRandomElement(members, 1)[0];
     return one.user.username;
   }
+  public getNow(): string {
+    const texts = ['爆睡丸GG', 'アイアン1', 'お風呂'];
+    return chooseRandomElement(texts, 1)[0];
+  }
 }
