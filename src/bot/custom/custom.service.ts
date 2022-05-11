@@ -8,6 +8,8 @@ import { getIdFromTeamSplittingMessage } from './utils/getIdFromTeamSplittingMes
 import { getChannels } from './utils/getChannels';
 import { getVoiceChannels } from './utils/getVoiceChannels';
 import { getConnectingVoiceChannelGuildMember } from './utils/getConnectingVoiceChannelGuildMember';
+import { collectionToArray } from './utils/collectionToArray';
+import { chooseRandomElement } from '../utils/chooseRandomElement';
 
 @Injectable()
 export class CustomService {
@@ -57,5 +59,14 @@ export class CustomService {
     });
 
     return '結果はおまいきの負け！';
+  }
+  public async chooseRandomMember(
+    interaction: CommandInteraction,
+  ): Promise<string> {
+    const members = collectionToArray(
+      await getVoiceChannelGuildMembers(interaction),
+    );
+    const one = chooseRandomElement(members, 1)[0];
+    return one.user.username;
   }
 }

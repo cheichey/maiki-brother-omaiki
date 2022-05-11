@@ -19,6 +19,6 @@ export const options: { [key: string]: CommandOptions } = {
   },
   random: {
     name: 'random',
-    description: 'ボイスチャットの人数からランダムに数字を言います',
+    description: 'ボイスチャットにいる人の中から一人選びます',
   },
 };
