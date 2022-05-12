@@ -63,9 +63,12 @@ export class CustomService {
   public async chooseRandomMember(
     interaction: CommandInteraction,
   ): Promise<string> {
-    const members = collectionToArray(
-      await getVoiceChannelGuildMembers(interaction),
+    const voiceChannelGuildMembers = await getVoiceChannelGuildMembers(
+      interaction,
     );
+    if ((await getNumberOfJoinedVoiceChannelPeople(interaction)) < 1)
+      return 'ボイスチャットに人がいないよ！';
+    const members = collectionToArray(voiceChannelGuildMembers);
     const one = chooseRandomElement(members, 1)[0];
     return one.user.username;
   }
