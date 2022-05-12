@@ -1,7 +1,7 @@
 import { CommandInteraction } from 'discord.js';
 import { DiscordGuard } from '@discord-nestjs/core';
 
-export class GuildCommandGuard implements DiscordGuard {
+export class OnlyInGuildGuard implements DiscordGuard {
   canActive(
     event: 'interactionCreate',
     [interaction]: [CommandInteraction],

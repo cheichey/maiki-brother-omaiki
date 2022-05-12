@@ -17,12 +17,12 @@ import { generateButton } from '../../utils/generateButton';
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 import { generateRow } from '../../utils/generateRow';
 import { WhichTeamWonInteractionCorrector } from '../interaction-collectors/which-team-won.interaction-corrector';
-import { GuildCommandGuard } from '../../guards/guild-command.guard';
+import { OnlyInGuildGuard } from '../../guards/only-in-guild.guard';
 
 @Injectable()
 @Command(options.finish)
 @UseCollectors(WhichTeamWonInteractionCorrector)
-@UseGuards(GuildCommandGuard)
+@UseGuards(OnlyInGuildGuard)
 export class FinishCommand implements DiscordCommand {
   constructor(
     @InjectDiscordClient()
