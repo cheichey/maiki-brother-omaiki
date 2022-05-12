@@ -1,20 +1,9 @@
-import {
-  Command,
-  CommandOptions,
-  DiscordTransformedCommand,
-  Payload,
-  TransformedCommandExecutionContext,
-} from '@discord-nestjs/core';
+import { Command, CommandOptions, DiscordCommand } from '@discord-nestjs/core';
 import { options } from '../../options';
-import { checkIsInteraction } from '../../utils/checkIsInteraction';
 
 @Command(options.help)
-export class HelpCommand implements DiscordTransformedCommand<any> {
-  handler(
-    @Payload() dto: any,
-    { interaction }: TransformedCommandExecutionContext,
-  ): string {
-    if (!checkIsInteraction(interaction)) return;
+export class HelpCommand implements DiscordCommand {
+  handler(): string {
     const message = (option: { [k: string]: CommandOptions }): string => {
       return Object.keys(option)
         .map((value) => {

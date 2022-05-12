@@ -1,35 +1,37 @@
 import {
   Command,
-  DiscordTransformedCommand,
+  DiscordCommand,
   InjectDiscordClient,
-  Payload,
-  TransformedCommandExecutionContext,
   UseCollectors,
+  UseGuards,
 } from '@discord-nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { CustomService } from '../custom.service';
 import { options } from '../../options';
-import { checkIsInteraction } from '../../utils/checkIsInteraction';
-import { Client, InteractionReplyOptions } from 'discord.js';
+import {
+  Client,
+  CommandInteraction,
+  InteractionReplyOptions,
+} from 'discord.js';
 import { generateButton } from '../../utils/generateButton';
 import { MessageButtonStyles } from 'discord.js/typings/enums';
 import { generateRow } from '../../utils/generateRow';
 import { WhichTeamWonInteractionCorrector } from '../interaction-collectors/which-team-won.interaction-corrector';
+import { GuildCommandGuard } from '../../guards/guild-command.guard';
 
 @Injectable()
 @Command(options.finish)
 @UseCollectors(WhichTeamWonInteractionCorrector)
-export class FinishCommand implements DiscordTransformedCommand<any> {
+@UseGuards(GuildCommandGuard)
+export class FinishCommand implements DiscordCommand {
   constructor(
     @InjectDiscordClient()
     private readonly client: Client,
     private readonly vcService: CustomService,
   ) {}
   async handler(
-    @Payload() dto: any,
-    { interaction }: TransformedCommandExecutionContext,
+    interaction: CommandInteraction,
   ): Promise<InteractionReplyOptions> {
-    if (!checkIsInteraction(interaction)) return;
     await this.vcService.finish(interaction);
     const button1 = generateButton(
       'アタッカーの勝利',

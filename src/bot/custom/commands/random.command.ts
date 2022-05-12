@@ -1,23 +1,16 @@
-import {
-  Command,
-  DiscordTransformedCommand,
-  Payload,
-  TransformedCommandExecutionContext,
-} from '@discord-nestjs/core';
+import { Command, DiscordCommand, UseGuards } from '@discord-nestjs/core';
 import { options } from '../../options';
-import { checkIsInteraction } from '../../utils/checkIsInteraction';
 import { Injectable } from '@nestjs/common';
 import { CustomService } from '../custom.service';
+import { GuildCommandGuard } from '../../guards/guild-command.guard';
+import { CommandInteraction } from 'discord.js';
 
 @Injectable()
 @Command(options.random)
-export class RandomCommand implements DiscordTransformedCommand<any> {
+@UseGuards(GuildCommandGuard)
+export class RandomCommand implements DiscordCommand {
   constructor(private customService: CustomService) {}
-  async handler(
-    @Payload() dto: any,
-    { interaction }: TransformedCommandExecutionContext,
-  ): Promise<string> {
-    if (!checkIsInteraction(interaction)) return;
+  async handler(interaction: CommandInteraction): Promise<string> {
     return this.customService.chooseRandomMember(interaction);
   }
 }

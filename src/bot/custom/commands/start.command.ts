@@ -1,23 +1,16 @@
-import {
-  Command,
-  DiscordTransformedCommand,
-  Payload,
-  TransformedCommandExecutionContext,
-} from '@discord-nestjs/core';
+import { Command, DiscordCommand, UseGuards } from '@discord-nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { CustomService } from '../custom.service';
 import { options } from '../../options';
-import { checkIsInteraction } from '../../utils/checkIsInteraction';
+import { CommandInteraction } from 'discord.js';
+import { GuildCommandGuard } from '../../guards/guild-command.guard';
 
 @Injectable()
 @Command(options.start)
-export class StartCommand implements DiscordTransformedCommand<any> {
+@UseGuards(GuildCommandGuard)
+export class StartCommand implements DiscordCommand {
   constructor(private readonly vcService: CustomService) {}
-  handler(
-    @Payload() dto: any,
-    { interaction }: TransformedCommandExecutionContext,
-  ): Promise<string> {
-    if (!checkIsInteraction(interaction)) return;
+  handler(interaction: CommandInteraction): Promise<string> {
     return this.vcService.start(interaction);
   }
 }
