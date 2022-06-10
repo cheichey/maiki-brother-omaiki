@@ -7,7 +7,7 @@ export const getTeamSplittingMessage = (
   try {
     teamSplittingMessage = messages
       .filter((message) => message.cleanContent.indexOf('Attacker Side') != -1)
-      .last().content;
+      .first().content;
   } catch (e) {
     return null;
   }

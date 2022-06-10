@@ -36,7 +36,6 @@ export class CustomService {
     const voiceChannel = getVoiceChannels(channels, 3);
     voiceMembers.forEach((member) => {
       const id = member.id.slice(0, 17);
-      console.log(attacker, defender, id);
       if (attacker.indexOf(id) != -1) {
         member.voice.setChannel(voiceChannel[0].id);
       } else if (defender.indexOf(id) != -1) {
